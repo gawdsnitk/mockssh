@@ -1,0 +1,24 @@
+body{
+  margin:0;
+  padding:0;
+  height:100%;
+  text-align: center;
+  background:black;
+  //overflow:hidden;
+  color:white;
+}
+.console{
+  display: inline-block;
+  height:20%;
+  width:100%;
+  background:black;
+  border:none;
+  margin:0;
+  resize:none;
+  color:white;
+  font-family: courier;
+  font-size: 5em;
+}
+.console:nth-child(3){
+  color:black;
+}

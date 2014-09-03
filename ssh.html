@@ -1,0 +1,145 @@
+<html>
+	<head>
+		<link href="css/style.css" rel="stylesheet">
+	</head>
+	<body>
+		<input type="text" class="console">
+		<input type="text" class="console" disabled="disabled">
+		<input type="text" class="console" disabled="disabled">
+		
+	<script src="js/jquery-1.9.1.min.js"></script>
+	<script src="js/jquery-textrange.js"></script>
+	<script>
+		var password, username, host;
+		
+		var host_to_connect = '192.168.1.156';
+		var username_phase = true, password_phase = false;
+		$(document).ready(function(){
+			console.log('Current phase is username phase');
+			$('.console:nth-child(1)').focus();		//first textbox is focuses
+			
+			password = '';		//initialise empty string to password
+			$(document).on("keypress",function(event){
+				if(event.keyCode  == 13 && username_phase)	//Enter key is pressed when user is typing username
+				{
+					username = '';
+					host = '';
+					var user_str = $('.console:nth-child(1)').val();
+					
+					//command syntax check
+					if(user_str.substring(0,4) == 'ssh '){
+						console.log('okay, it is an ssh command');
+						var i;
+						for(i=4;i<user_str.length;++i){
+							if(user_str[i] == '@')
+							break;
+							username += user_str[i];
+						}
+						++i;
+						for(;i<user_str.length;++i){
+							host += user_str[i];
+						}
+						if(host!= host_to_connect){
+							console.log('Hostname was not matched to what is defined');
+							showError('No such host!!!');
+							return;
+						}
+						else{
+							console.log('okay, it is a valid host');
+						}
+					}
+					//wrong syntax
+					else{
+						showError('Wrong Syntax!!!');
+						return;
+					}
+					
+					console.log('username typed is '+username)
+					if(username == 'master'){
+						login();
+						return;
+					}
+					//User found
+					if(UserExists(username)){
+						console.log('Username exists in the database');
+						$('.console:nth-child(1)').attr("disabled","disabled");
+						$('.console:nth-child(2)').val('Password:');
+						$('.console:nth-child(3)').removeAttr("disabled");
+						$('.console:nth-child(3)').focus();
+					}
+					//User not found
+					else{
+						console.log('Username does not exist in the database');
+						showError('No Such User Name!!!');
+						return;
+					}
+					username_phase = false;
+					password_phase = true;
+					console.log('Password phase started');
+				}
+				else if(event.keyCode ==13 && password_phase){	//Enter key is pressed when user is typing password
+					console.log('password typed is '+password);
+					if(Authorized(username, password)){
+						console.log('Password matched for the user');
+						login();
+						return;
+					}
+					else{
+						console.log('Password not matched for the user');
+						$('.console:nth-child(2)').val('');
+						showError('User cannot be authorised');
+						return;
+					}
+				}
+				if(password_phase){
+					password += String.fromCharCode(event.which);
+				}
+			});
+		});
+		
+		//AJAX function for checking if user exists or not
+		function UserExists(user){
+			return true;
+		}
+		
+		//AJAX function for checking if user and password combination is correct
+		function Authorized(user , pass){
+			return true;
+		}
+		
+		//AJAX function for login and displaying post screen
+		function login(){
+			console.log('Congrats, you have been logged in');
+			return true;
+		}
+		
+		//Function for showing error, just call it and it will take care of reseting everything
+		function showError(err_message){
+			$('.console:nth-child(1)').val(err_message);
+			$('.console:nth-child(1)').css('color','red');
+			$('.console:nth-child(1)').attr('disabled','disabled');
+			$('.console:nth-child(2)').attr('disabled','disabled');
+			$('.console:nth-child(3)').attr('disabled','disabled');
+			setTimeout(function(){
+				$('.console:nth-child(1)').val('');
+				$('.console:nth-child(1)').css('color','white');
+				reset();
+			},3000);
+		}
+		
+		//Function for reseting
+		function reset(){
+			username_phase = true;
+			password_phase = false;
+			password = '';
+			$('.console:nth-child(1)').removeAttr('disabled');
+			$('.console:nth-child(2)').attr('disabled','disabled');
+			$('.console:nth-child(3)').attr('disabled','disabled');
+			$('.console:nth-child(1)').focus();
+			
+			console.log('Everything is reset');
+			console.log('Current phase is username phase');
+		}
+	</script>
+	</body>
+</html>
