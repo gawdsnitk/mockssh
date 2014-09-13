@@ -8,7 +8,6 @@
 		<input type="text" class="console" disabled="disabled">
 		
 	<script src="js/jquery-1.9.1.min.js"></script>
-	<script src="js/jquery-textrange.js"></script>
 	<script>
 		var password, username, host;
 		
@@ -39,14 +38,14 @@
 						for(;i<user_str.length;++i){
 							host += user_str[i];
 						}
-						if(host!= host_to_connect){
+						/*if(host!= host_to_connect){
 							console.log('Hostname was not matched to what is defined');
 							showError('No such host!!!');
 							return;
 						}
 						else{
 							console.log('okay, it is a valid host');
-						}
+						}*/
 					}
 					//wrong syntax
 					else{
@@ -60,6 +59,7 @@
 						return;
 					}
 					//User found
+console.log(UserExists(username));
 					if(UserExists(username)){
 						console.log('Username exists in the database');
 						$('.console:nth-child(1)').attr("disabled","disabled");
@@ -99,18 +99,41 @@
 		
 		//AJAX function for checking if user exists or not
 		function UserExists(user){
-			return true;
+			var check;
+			$.ajax({
+				url: 'userAvailable.php?username='+user,
+				success:function(data){				
+					if(data == "1")
+						check = 1;
+					else
+						check = 0;
+					},
+				async: false
+			});
+			return check;
 		}
 		
 		//AJAX function for checking if user and password combination is correct
 		function Authorized(user , pass){
-			return true;
+			var check;
+			$.ajax({
+				url: 'userValidate.php?username='+user+'&password='+pass,
+				success:function(data){				
+					if(data == "1")
+						check = 1;
+					else
+						check = 0;
+					},
+				async: false
+			});
+			return check;
 		}
 		
 		//AJAX function for login and displaying post screen
 		function login(){
 			console.log('Congrats, you have been logged in');
-			return true;
+			window.location.assign('index.php');
+//			return true;
 		}
 		
 		//Function for showing error, just call it and it will take care of reseting everything
